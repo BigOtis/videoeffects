@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 import numpy as np
 import pyaudio
 from bgblur import blur_background
+from matrix_filter import matrix_filter
 
 # Initialize PyAudio
 p = pyaudio.PyAudio()
@@ -51,9 +52,7 @@ def apply_filter(frame, filter_name, audio_level):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
     elif filter_name == "Matrix Effect":
-        edges = cv2.Canny(frame, 100, 200)
-        frame = cv2.bitwise_and(frame, frame, mask=edges)
-        frame[edges == 255] = [0, 255, 0]
+        frame = matrix_filter(frame)
     elif filter_name == "Audio Reactive":
         threshold = 5000
         if audio_level > threshold:

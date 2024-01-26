@@ -1,4 +1,6 @@
 import mediapipe as mp
+import cv2
+import numpy as np
 
 # Initialize MediaPipe Selfie Segmentation
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
