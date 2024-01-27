@@ -3,3 +3,4 @@ Pillow
 pyaudio 
 numpy
 mediapipe
+pyqt5

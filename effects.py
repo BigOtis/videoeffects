@@ -4,8 +4,9 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 import numpy as np
 import pyaudio
-from bgblur import blur_background
+from background import blur_background, greenscreen_background
 from matrix_filter import matrix_filter
+from face_filter import face_tracking_filter
 
 # Initialize PyAudio
 p = pyaudio.PyAudio()
@@ -59,8 +60,12 @@ def apply_filter(frame, filter_name, audio_level):
             current_tint_color = generate_strong_color()
         overlay = np.full(frame.shape, current_tint_color, dtype=np.uint8)
         cv2.addWeighted(overlay, 0.4, frame, 0.6, 0, frame)
-    elif filter_name == "Blur Background":  # Handle the new filter
+    elif filter_name == "Blur Background":
         frame = blur_background(frame)
+    elif filter_name == "Green Screen":
+        frame = greenscreen_background(frame)
+    elif filter_name == "Face Tracking":
+        frame = face_tracking_filter(frame, "images/face_mask.png")
     return frame
 
 # Function to get frame from the webcam and apply selected filter
@@ -95,7 +100,7 @@ root = tk.Tk()
 filter_var = tk.StringVar()
 filter_var.set("No Filter")
 filter_dropdown = ttk.Combobox(root, textvariable=filter_var, state="readonly")
-filter_dropdown['values'] = ("No Filter", "Black and White", "Matrix Effect", "Audio Reactive", "Blur Background") 
+filter_dropdown['values'] = ("No Filter", "Black and White", "Matrix Effect", "Audio Reactive", "Blur Background", "Green Screen", "Face Tracking") 
 filter_dropdown.pack()
 
 # Display area for the webcam output
