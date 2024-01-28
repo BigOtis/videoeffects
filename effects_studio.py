@@ -105,6 +105,57 @@ class CameraApp(QWidget):
         elif filter_name == "Time Slice":
             frame = time_slice_filter.process_frame(frame)
         return frame
+    
+    def apply_filters_to_video(self, input_file, output_file, selected_filters):
+        # Open the input video file
+        cap = cv2.VideoCapture(input_file)
+        if not cap.isOpened():
+            print(f"Error: Could not open video {input_file}")
+            return
+
+        # Get video properties
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        # Calculate frame numbers for progress updates
+        progress_markers = {
+            "25%": total_frames * 0.25,
+            "50%": total_frames * 0.50,
+            "75%": total_frames * 0.75
+        }
+
+        # Define the codec and create a VideoWriter object to write the output video
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
+
+        current_frame = 0  # Current frame counter
+
+        # Process the video frame by frame
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            # Apply selected filters
+            for filter_name in selected_filters:
+                frame = self.apply_filter(frame, filter_name)
+
+            # Write the frame to the output video
+            out.write(frame)
+
+            # Check for progress
+            for progress, frame_number in progress_markers.items():
+                if current_frame == int(frame_number):
+                    print(f"Processing is {progress} complete.")
+
+            current_frame += 1
+
+        # Release resources
+        cap.release()
+        out.release()
+        print(f"Video processing complete. Output saved as {output_file}")
 
     def closeEvent(self, event):
         self.cap.release()
@@ -112,5 +163,12 @@ class CameraApp(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = CameraApp()
-    ex.show()
-    sys.exit(app.exec_())
+    if len(sys.argv) > 1:  # Command line arguments were provided
+        input_video = sys.argv[1]
+        output_video = sys.argv[2]
+        # Combine all remaining arguments into a single string and split on commas
+        filters_to_apply = ' '.join(sys.argv[3:]).split(',')
+        ex.apply_filters_to_video(input_video, output_video, filters_to_apply)
+    else:  # No command line arguments, launch the GUI
+        ex.show()
+        sys.exit(app.exec_())
