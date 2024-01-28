@@ -2,6 +2,9 @@
 
 This project is a camera filter application built in Python. It uses OpenCV and MediaPipe to create unique filters for your camera. It can also process MP4 files that are input.
 
+![image](https://github.com/BigOtis/videoeffects/assets/6844863/0c07d454-70f0-4a4d-9e15-6a623e9157fb)
+
+
 ## Requirements
 
 - Python 3.11
