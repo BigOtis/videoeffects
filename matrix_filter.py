@@ -8,7 +8,7 @@ previous_frame_gray = None  # Store the previous frame for frame differencing
 matrix_streams = []  # List to track active matrix streams
 frame_count = 0  # Frame counter for consistent number display
 
-def matrix_filter(frame, enable_rain_effect=True):
+def matrix_filter(frame, enable_rain_effect=False):
     global edges_buffer, previous_frame_gray, matrix_streams, frame_count
 
     # Matrix stream parameters

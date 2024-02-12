@@ -53,8 +53,26 @@ class CameraApp(QWidget):
         self.apply_button.clicked.connect(self.applySelectedFilters)
         layout.addWidget(self.apply_button)
 
+    def updateFrame(self):
+        ret, frame = self.cap.read()
+        if ret:
+            frame = cv2.flip(frame, 1)
+            for filter_name in self.selected_filters:
+                frame = self.apply_filter(frame, filter_name)
+
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            h, w, ch = frame.shape
+            bytes_per_line = ch * w
+            qimg = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
+            self.image_label.setPixmap(QPixmap.fromImage(qimg))
+
+    def sendFrameToVirtualCamera(self, frame):
+        frame = cv2.resize(frame, (self.virtual_cam.width, self.virtual_cam.height))
+        self.virtual_cam.send(frame)
+        self.virtual_cam.sleep_until_next_frame()
+
     def initCamera(self):
-        self.cap = cv2.VideoCapture(1)  # Change to 0 if your webcam index is different
+        self.cap = cv2.VideoCapture(0)  # Change based on webcam index
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateFrame)
         self.timer.start(20)
